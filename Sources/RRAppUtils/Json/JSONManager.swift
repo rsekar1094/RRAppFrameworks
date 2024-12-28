@@ -8,13 +8,13 @@
 import Foundation
 
 /// Helper class to convert json data
-struct JSONManager {
+public struct JSONManager {
     
     /// Return a dictionary from the data
     ///
     /// - Parameter dictionaryAsData: data object to convert
     /// - Returns: dictonary of string to string
-    static func dictionaryFromData(_ dictionaryAsData: Data?) throws -> [String: Any] {
+    public static func dictionaryFromData(_ dictionaryAsData: Data?) throws -> [String: Any] {
         guard let dictionaryAsData = dictionaryAsData else {
             throw NSError(domain: "Data is null", code: -422)
         }
@@ -27,7 +27,7 @@ struct JSONManager {
     ///
     /// - Parameter dictionary: Dictionary representation of json
     /// - Returns: data object with the json
-    static func dataFromDictionary(_ dictionary: [String: Any]?) throws -> Data {
+    public static func dataFromDictionary(_ dictionary: [String: Any]?) throws -> Data {
         guard let dictionary = dictionary else {
             throw NSError(domain: "Dictionary is nill", code: -422)
         }
@@ -41,7 +41,7 @@ struct JSONManager {
     /// - Parameter json: json
     /// - Parameter prettyPrinted : printing style default to false
     /// - Returns: data object with the json
-    static func stringify(json: Any, prettyPrinted: Bool = false) throws -> String {
+    public static func stringify(json: Any, prettyPrinted: Bool = false) throws -> String {
         var options: JSONSerialization.WritingOptions = []
         if prettyPrinted {
             options = JSONSerialization.WritingOptions.prettyPrinted
@@ -55,7 +55,7 @@ struct JSONManager {
         }
     }
     
-    static func jsonStringFromDictionary(dict : Any) throws -> String {
+    public static func jsonStringFromDictionary(dict : Any) throws -> String {
         let theJSONData = try JSONSerialization.data(
             withJSONObject: dict,
             options: []
@@ -68,7 +68,7 @@ struct JSONManager {
         return string
     }
     
-    static func dictionaryFromJSONString(string : String) throws -> Dictionary<String,Any> {
+    public static func dictionaryFromJSONString(string : String) throws -> Dictionary<String,Any> {
         let data = string.data(using: .utf8)!
         guard let dict = try JSONSerialization.jsonObject(with: data, options : .allowFragments) as? Dictionary<String,Any> else {
             throw NSError(domain: "Can't generate dict", code: -412)
@@ -77,7 +77,7 @@ struct JSONManager {
         return dict
     }
     
-    static func fetchData<T: Decodable>(fileName : String,from bundle: Bundle) throws -> T {
+    public static func fetchData<T: Decodable>(fileName : String,from bundle: Bundle) throws -> T {
         guard let path = bundle.path(forResource: fileName, ofType: "json") else {
             throw NSError(domain: "File is not found", code: -422)
         }
