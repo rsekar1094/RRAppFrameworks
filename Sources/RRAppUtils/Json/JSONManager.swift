@@ -86,4 +86,14 @@ public struct JSONManager {
         let model = try JSONDecoder().decode(T.self, from: data)
         return model
     }
+    
+    public static func fetchArrayData<T: Decodable>(fileName : String,from bundle: Bundle) throws -> [T] {
+        guard let path = bundle.path(forResource: fileName, ofType: "json") else {
+            throw NSError(domain: "File is not found", code: -422)
+        }
+        
+        let data = try Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe)
+        let models = try JSONDecoder().decode([T].self, from: data)
+        return models
+    }
 }
