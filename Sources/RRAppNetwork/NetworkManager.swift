@@ -10,7 +10,7 @@ import RRAppUtils
 
 // MARK: - NetworkService
 public protocol NetworkService {
-    func fetch<T: Decodable>(
+    func perform<T: Decodable>(
         request: NetworkRequest
     ) async throws -> T
 }
@@ -23,7 +23,7 @@ public class URLSessionNetworkManager: NetworkService {
     @Inject
     var config: Config
     
-    public func fetch<T: Decodable>(
+    public func perform<T: Decodable>(
         request: NetworkRequest
     ) async throws -> T {
         guard let url = URL(string: config.apiBasePath + "/" + request.path) else {
@@ -77,10 +77,10 @@ public struct NetworkRequest {
     
     public typealias BodyParams = [String: Any]
     
-    let method: Method
-    let path: String
-    let body: BodyParams?
-    let additionalHeader: [String: String]
+    public let method: Method
+    public let path: String
+    public let body: BodyParams?
+    public let additionalHeader: [String: String]
     
     public init(
         method: Method,
@@ -97,7 +97,7 @@ public struct NetworkRequest {
 
 // MARK: - NetworkServiceMock
 public struct NetworkServiceMock: NetworkService {
-    public func fetch<T>(request: NetworkRequest) async throws -> T where T : Decodable {
+    public func perform<T>(request: NetworkRequest) async throws -> T where T : Decodable {
         throw NetworkError.invalidResponse
     }
     
