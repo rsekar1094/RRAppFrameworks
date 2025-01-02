@@ -7,6 +7,7 @@
 
 import Foundation
 import RRAppUtils
+import os
 
 // MARK: - NetworkService
 public protocol StreamingNetworkService: Actor {
@@ -24,6 +25,7 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
     @Inject
     private var config: Config
     private weak var delegate: StreamingNetworkDelegate?
+    private let logger = Logger(subsystem: "RRAppBaseFrameworks.StreamingNetworkManager", category: "NetworkManager")
     
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.default
@@ -49,6 +51,8 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
         
         let jsonData = try JSONSerialization.data(withJSONObject: request.body ?? [:], options: [])
         urlRequest.httpBody = jsonData
+        
+        logger.log("\(urlRequest.description)")
     
         // Create a data task that will receive chunked data
         let task = URLSession.shared.dataTask(with: urlRequest)
@@ -67,6 +71,15 @@ extension StreamingNetworkManager: URLSessionDataDelegate {
         dataTask: URLSessionDataTask,
         didReceive data: Data
     ) {
+        logger.log("urlSession dataTask \(data)")
         self.delegate?.didReceive(data: data, taskId: dataTask.taskIdentifier)
+    }
+    
+    @nonobjc public func urlSession(
+        _ session: URLSession,
+        task: URLSessionTask,
+        didCompleteWithError error: (any Error)?
+    ) {
+        logger.log("didCompleteWithError \(error)")
     }
 }

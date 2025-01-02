@@ -7,6 +7,7 @@
 
 import Foundation
 import RRAppUtils
+import os
 
 // MARK: - NetworkService
 public protocol NetworkService: Actor {
@@ -22,6 +23,7 @@ public actor URLSessionNetworkManager: NetworkService {
     
     @Inject
     var config: Config
+    private let logger = Logger(subsystem: "RRAppBaseFrameworks.URLSessionNetworkManager", category: "NetworkManager")
     
     public func perform<T: Decodable>(
         request: NetworkRequest
@@ -40,6 +42,8 @@ public actor URLSessionNetworkManager: NetworkService {
         
         let jsonData = try JSONSerialization.data(withJSONObject: request.body ?? [:], options: [])
         urlRequest.httpBody = jsonData
+        
+        logger.log("\(urlRequest.description)")
         
         let (data, response) = try await URLSession.shared.data(for: urlRequest)
         
