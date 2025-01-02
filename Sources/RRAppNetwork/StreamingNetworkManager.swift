@@ -55,7 +55,7 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
         logger.log("\(urlRequest.debugDescription)")
     
         // Create a data task that will receive chunked data
-        let task = URLSession.shared.dataTask(with: urlRequest)
+        let task = session.dataTask(with: urlRequest)
         task.resume()
         return task.taskIdentifier
     }
