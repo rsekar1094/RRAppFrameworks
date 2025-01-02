@@ -10,7 +10,7 @@ import RRAppUtils
 
 // MARK: - NetworkService
 public protocol StreamingNetworkService: Actor {
-    var delegate: StreamingNetworkDelegate? { get set }
+    func setDelegate(_ delegate: StreamingNetworkDelegate)
     func listen(to request: NetworkRequest) async throws -> Int
 }
 
@@ -23,8 +23,7 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
     
     @Inject
     private var config: Config
-    
-    public weak var delegate: StreamingNetworkDelegate?
+    private weak var delegate: StreamingNetworkDelegate?
     
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.default
@@ -55,6 +54,10 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
         let task = URLSession.shared.dataTask(with: urlRequest)
         task.resume()
         return task.taskIdentifier
+    }
+    
+    public func setDelegate(_ delegate: StreamingNetworkDelegate) {
+        self.delegate = delegate
     }
 }
 
