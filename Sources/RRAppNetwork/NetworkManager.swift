@@ -9,14 +9,14 @@ import Foundation
 import RRAppUtils
 
 // MARK: - NetworkService
-public protocol NetworkService {
+public protocol NetworkService: Actor {
     func perform<T: Decodable>(
         request: NetworkRequest
     ) async throws -> T
 }
 
 // MARK: - URLSessionNetworkManager
-public class URLSessionNetworkManager: NetworkService {
+public actor URLSessionNetworkManager: NetworkService {
     
     public init() {}
     
@@ -99,7 +99,7 @@ public struct NetworkRequest: Sendable {
 }
 
 // MARK: - NetworkServiceMock
-public struct NetworkServiceMock: NetworkService {
+public actor NetworkServiceMock: NetworkService {
     public func perform<T>(request: NetworkRequest) async throws -> T where T : Decodable {
         throw NetworkError.invalidResponse
     }
