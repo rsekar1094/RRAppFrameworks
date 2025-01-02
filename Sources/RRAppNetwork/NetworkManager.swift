@@ -69,8 +69,8 @@ public enum NetworkError: LocalizedError {
 }
 
 // MARK: - NetworkRequest
-public struct NetworkRequest {
-    public enum Method: String {
+public struct NetworkRequest: Sendable {
+    public enum Method: String, Sendable {
         case post = "POST"
         case get = "GET"
     }
@@ -79,7 +79,10 @@ public struct NetworkRequest {
     
     public let method: Method
     public let path: String
+    
+    nonisolated(unsafe)
     public let body: BodyParams?
+    
     public let additionalHeader: [String: String]
     
     public init(

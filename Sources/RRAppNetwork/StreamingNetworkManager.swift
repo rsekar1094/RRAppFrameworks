@@ -9,24 +9,28 @@ import Foundation
 import RRAppUtils
 
 // MARK: - NetworkService
-public protocol StreamingNetworkService {
-    var urlSessionDataDelegate: URLSessionDataDelegateHolder { get }
-    func listen(to request: NetworkRequest) throws -> Int
+public protocol StreamingNetworkService: Actor {
+    var delegate: StreamingNetworkDelegate? { get set }
+    func listen(to request: NetworkRequest) async throws -> Int
 }
 
+public protocol StreamingNetworkDelegate: AnyObject {
+    func didReceive(data: Data, taskId: Int)
+}
 
-public final class StreamingNetworkManager: StreamingNetworkService {
+// MARK: - StreamingNetworkManager
+public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
     
     @Inject
     private var config: Config
     
-    public let urlSessionDataDelegate = URLSessionDataDelegateHolder()
+    public weak var delegate: StreamingNetworkDelegate?
     
     private lazy var session: URLSession = {
         let config = URLSessionConfiguration.default
         return URLSession(
             configuration: config,
-            delegate: urlSessionDataDelegate,
+            delegate: self,
             delegateQueue: nil
         )
     }()
@@ -54,22 +58,12 @@ public final class StreamingNetworkManager: StreamingNetworkService {
     }
 }
 
-public actor URLSessionDataDelegateHolder: NSObject, URLSessionDataDelegate {
-    
-    private var didReceive: ((URLSessionDataTask, Data) -> Void)?
-    
+extension StreamingNetworkManager: URLSessionDataDelegate {
     @nonobjc public func urlSession(
         _ session: URLSession,
         dataTask: URLSessionDataTask,
         didReceive data: Data
     ) {
-        didReceive?(dataTask, data)
-    }
-    
-    public func setDidReceive(
-        _ closure: @escaping (URLSessionDataTask, Data) -> Void
-    ) {
-        self.didReceive = closure
+        self.delegate?.didReceive(data: data, taskId: dataTask.taskIdentifier)
     }
 }
-
