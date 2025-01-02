@@ -43,9 +43,11 @@ public actor URLSessionNetworkManager: NetworkService {
         let jsonData = try JSONSerialization.data(withJSONObject: request.body ?? [:], options: [])
         urlRequest.httpBody = jsonData
         
-        logger.log("\(urlRequest.description)")
+        logger.log("\(urlRequest.debugDescription)")
         
         let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        
+        logger.log("response \(response) \(String(data: data, encoding: .utf8) ?? "")")
         
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {

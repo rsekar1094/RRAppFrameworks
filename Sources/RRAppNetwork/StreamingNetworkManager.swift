@@ -52,7 +52,7 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
         let jsonData = try JSONSerialization.data(withJSONObject: request.body ?? [:], options: [])
         urlRequest.httpBody = jsonData
         
-        logger.log("\(urlRequest.description)")
+        logger.log("\(urlRequest.debugDescription)")
     
         // Create a data task that will receive chunked data
         let task = URLSession.shared.dataTask(with: urlRequest)
