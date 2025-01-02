@@ -15,7 +15,7 @@ public protocol StreamingNetworkService: Actor {
     func listen(to request: NetworkRequest) async throws -> Int
 }
 
-public protocol StreamingNetworkDelegate: AnyObject {
+public protocol StreamingNetworkDelegate: AnyObject, Sendable {
     func didReceive(data: Data, taskId: Int)
 }
 
@@ -66,16 +66,14 @@ public actor StreamingNetworkManager: NSObject, StreamingNetworkService {
 }
 
 extension StreamingNetworkManager: URLSessionDataDelegate {
-    @nonobjc public func urlSession(
-        _ session: URLSession,
-        dataTask: URLSessionDataTask,
-        didReceive data: Data
-    ) {
+    nonisolated public func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
         logger.log("urlSession dataTask \(data)")
-        self.delegate?.didReceive(data: data, taskId: dataTask.taskIdentifier)
+        Task {
+            await self.delegate?.didReceive(data: data, taskId: dataTask.taskIdentifier)
+        }
     }
     
-    @nonobjc public func urlSession(
+    nonisolated public func urlSession(
         _ session: URLSession,
         task: URLSessionTask,
         didCompleteWithError error: (any Error)?
