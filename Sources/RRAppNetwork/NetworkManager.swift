@@ -40,8 +40,10 @@ public actor URLSessionNetworkManager: NetworkService {
         }
         urlRequest.httpMethod = request.method.rawValue
         
-        let jsonData = try JSONSerialization.data(withJSONObject: request.body ?? [:], options: [])
-        urlRequest.httpBody = jsonData
+        if let body = request.body, !body.isEmpty {
+            let jsonData = try JSONSerialization.data(withJSONObject: body, options: [])
+            urlRequest.httpBody = jsonData
+        }
         
         logger.log("\(urlRequest.debugDescription)")
         
